@@ -250,8 +250,13 @@ function getWeekNumberByDate(date) {
  * Date(2024, 0, 13) => Date(2024, 8, 13)
  * Date(2023, 1, 1) => Date(2023, 9, 13)
  */
-function getNextFridayThe13th(/* date */) {
-  throw new Error('Not implemented');
+function getNextFridayThe13th(date) {
+  date.setDate(13);
+  if (date.getDay() === 5) {
+    return date;
+  }
+  date.setMonth(date.getMonth() + 1);
+  return getNextFridayThe13th(date);
 }
 
 /**
@@ -289,8 +294,29 @@ function getQuarter(date) {
  * { start: '01-01-2024', end: '15-01-2024' }, 1, 3 => ['01-01-2024', '05-01-2024', '09-01-2024', '13-01-2024']
  * { start: '01-01-2024', end: '10-01-2024' }, 1, 1 => ['01-01-2024', '03-01-2024', '05-01-2024', '07-01-2024', '09-01-2024']
  */
-function getWorkSchedule(/* period, countWorkDays, countOffDays */) {
-  throw new Error('Not implemented');
+function getWorkSchedule(period, countWorkDays, countOffDays) {
+  const startArr = period.start.split('-');
+  const endArr = period.end.split('-');
+  const startDate = new Date(startArr[2], startArr[1] - 1, startArr[0]);
+  const endDate = new Date(endArr[2], endArr[1] - 1, endArr[0]);
+  const res = [];
+  const zeroAdder = (arg) => {
+    if (arg < 10) return `0${arg}`;
+    return arg;
+  };
+  for (let i = startDate; i <= endDate; i) {
+    for (let j = 0; j < countWorkDays; j += 1) {
+      res.push(
+        `${zeroAdder(i.getDate())}-${zeroAdder(i.getMonth() + 1)}-${i.getFullYear()}`
+      );
+      if (i <= endDate) i.setDate(i.getDate() + 1);
+      if (i >= endDate) j = countWorkDays + 1;
+    }
+    for (let k = 0; k < countOffDays; k += 1) {
+      i.setDate(i.getDate() + 1);
+    }
+  }
+  return res;
 }
 
 /**
@@ -305,8 +331,13 @@ function getWorkSchedule(/* period, countWorkDays, countOffDays */) {
  * Date(2022, 2, 1) => false
  * Date(2020, 2, 1) => true
  */
-function isLeapYear(/* date */) {
-  throw new Error('Not implemented');
+function isLeapYear(date) {
+  const year = date.getFullYear();
+  const startYear = new Date(year, 0, 1);
+  const endYear = new Date(year, 11, 31);
+  const daysOfYear = (endYear - startYear) / 1000 / 3600 / 24 + 1;
+  if (daysOfYear === 366) return true;
+  return false;
 }
 
 module.exports = {
