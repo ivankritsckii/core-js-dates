@@ -144,8 +144,11 @@ function getCountDaysOnPeriod(dateStart, dateEnd) {
  * '2024-02-02', { start: '2024-02-02', end: '2024-03-02' } => true
  * '2024-02-10', { start: '2024-02-02', end: '2024-03-02' } => true
  */
-function isDateInPeriod(/* date, period */) {
-  throw new Error('Not implemented');
+function isDateInPeriod(date, period) {
+  const curDate = new Date(date);
+  const startDate = new Date(period.start);
+  const endDate = new Date(period.end);
+  return curDate >= startDate && curDate <= endDate;
 }
 
 /**
@@ -159,8 +162,31 @@ function isDateInPeriod(/* date, period */) {
  * '1999-01-05T02:20:00.000Z' => '1/5/1999, 2:20:00 AM'
  * '2010-12-15T22:59:00.000Z' => '12/15/2010, 10:59:00 PM'
  */
-function formatDate(/* date */) {
-  throw new Error('Not implemented');
+function formatDate(date) {
+  const thisDate = new Date(date).toLocaleString('en-UZ', {
+    timeZone: 'UTC',
+  });
+  const DATE = new Date(thisDate);
+  const day = DATE.getDate();
+  const month = DATE.getMonth();
+  const year = DATE.getFullYear();
+  let hours = DATE.getHours();
+  const minutes = DATE.getMinutes();
+  const seconds = DATE.getSeconds();
+  let AMorPM = 'AM';
+  if (hours > 11) {
+    AMorPM = 'PM';
+  }
+  if (hours > 12) {
+    hours -= 12;
+  }
+  const zeroAdder = (arg) => {
+    if (arg < 10) {
+      return `0${arg}`;
+    }
+    return `${arg}`;
+  };
+  return `${month + 1}/${day}/${year}, ${hours}:${zeroAdder(minutes)}:${zeroAdder(seconds)} ${AMorPM}`;
 }
 
 /**
@@ -175,8 +201,18 @@ function formatDate(/* date */) {
  * 12, 2023 => 10
  * 1, 2024 => 8
  */
-function getCountWeekendsInMonth(/* month, year */) {
-  throw new Error('Not implemented');
+function getCountWeekendsInMonth(month, year) {
+  const startMonth = new Date(year, month - 1);
+  const endMonth = new Date(year, month);
+  const daysOnMonths = (endMonth - startMonth) / 1000 / 3600 / 24;
+  const resArr = [];
+  let curDay = startMonth.getDay();
+  for (let i = 0; i < daysOnMonths; i += 1) {
+    resArr.push(curDay);
+    curDay += 1;
+    if (curDay === 7) curDay = 0;
+  }
+  return resArr.filter((a) => a === 6 || a === 0).length;
 }
 
 /**
